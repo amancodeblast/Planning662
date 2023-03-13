@@ -193,6 +193,8 @@ def main():
 
     org_coord_start = [x1, y1]
     org_cord_goal = [x2, y2]
+    if x1==x2 and y1==y2:
+        print("Goal and Start should be seperate")
 
     # print("Start coordiante: {}".format(org_coord_start))
     # print("Goal Coordinate: {}".format(org_cord_goal))
