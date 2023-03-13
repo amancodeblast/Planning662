@@ -24,7 +24,7 @@ def djiktras_algo(strt,goal,grid_rows,grid_columns):
 
     # grid_rows = 250  
     # grid_columns = 600
-
+    # Adding the obstacles along with the required padding 
     image_grid = np.zeros((grid_rows, grid_columns), np.uint8)
     points_up_rect = np.array(
         [[100, 0], [150, 0], [150, 100], [100, 100]])  
@@ -57,17 +57,11 @@ def djiktras_algo(strt,goal,grid_rows,grid_columns):
         print("The Coordinates entered for either start or goal node falls upon an obstacle. Change the input accordingly")
         possible = False
         exit()
-    
     ## Drawing start and end using circle
     radius = 5
-
     color_goal = (0, 255, 0)
     color_start = (255, 0, 0)
-
     thickness = -1
-
-
-
     # cv2.imshow("Image",image_grid)
     # cv2.waitKey(0)
     grid_image_colored = np.dstack([image_grid.copy(), image_grid.copy(), image_grid.copy()])
@@ -79,13 +73,15 @@ def djiktras_algo(strt,goal,grid_rows,grid_columns):
     fourcc = cv2.VideoWriter_fourcc(*"mp4v")
     out = cv2.VideoWriter("./out.mp4", fourcc, 5000, (grid_columns, grid_rows))
 
-
+    ## Implementing the Djiktras algo 
+    # Instantiating Priority Queue to get the min element easily
     min_heap_node = PriorityQueue()
-
+    # visited array set for checking if the node is visited or not
     vstd_set = set([])
+    # Getting the dictionary for sotring the key and value for the nodes for position vs node created
     dict_nodes = {}
 
-
+    # distance or weight assigned for the cell or position for obstacles
     dst_cal = {}
     for i in range(0, grid_columns):
         for j in range(0, grid_rows):
@@ -98,7 +94,7 @@ def djiktras_algo(strt,goal,grid_rows,grid_columns):
     dict_nodes[str(node.pos)] = node
     min_heap_node.put([node.cost, node.pos])
     reached = False
-
+    # starting the iteration to check which node is min cost and expanding towards that
 
     if possible:
         while not min_heap_node.empty():
@@ -109,14 +105,15 @@ def djiktras_algo(strt,goal,grid_rows,grid_columns):
                 dict_nodes[str(goal)] = Node(goal, node_temp[0], node)
                 reached = True
                 break
-
+            # checking all possibilities of the steps 
             for step_node, cost in next_step(image_grid,node,grid_rows,grid_columns):
-
+                # if node already visited, changin the cost if the new cost is less. 
                 if str(step_node) in vstd_set:
                     temp_cost = cost + dst_cal[str(node.pos)]
                     if temp_cost < dst_cal[str(step_node)]:
                         dst_cal[str(step_node)] = temp_cost
                         dict_nodes[str(step_node)].parent = node
+                # if node is not visited then adding the node and attaching the cost associated
                 else:
 
                     vstd_set.add(str(step_node))
@@ -131,7 +128,7 @@ def djiktras_algo(strt,goal,grid_rows,grid_columns):
                     min_heap_node.put([abs_cost, new_node.pos])
 
         print("The total tiime taken for Djiktras Algorithm is {:.3f}".format( (time.time() - start_time)))
-
+        # Backtracking the grid to trace the optimal path found. 
         final_node = dict_nodes[str(goal)]
 
         parnt_nde = final_node.parent
@@ -150,7 +147,7 @@ def djiktras_algo(strt,goal,grid_rows,grid_columns):
 
 
 
-
+## calculate the possible steps for hte next best move 
 def next_step(image_grid, node,grid_rows,grid_columns):  
     i = node.x
     j = node.y
@@ -168,7 +165,7 @@ def next_step(image_grid, node,grid_rows,grid_columns):
                 cost = math.sqrt(2) if pos > 3 else 1
                 allowed_steps.append([step, cost])
     return allowed_steps  
-
+## function to change the coordinates entered to the image coordinates used by opencv 
 def org2opencv_conversion(org_coord_start,org_cord_goal, row, col):
     strt= [org_coord_start[0],row-org_coord_start[1]]
     goal= [org_cord_goal[0],row-org_cord_goal[1]]
