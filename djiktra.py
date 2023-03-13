@@ -68,15 +68,16 @@ def djiktras_algo(strt,goal,grid_rows,grid_columns):
 
 
 
-    # cv2.imshow("Image",image_grid)
-    # cv2.waitKey(0)
+    cv2.imshow("Image",image_grid)
+    cv2.waitKey(0)
     grid_image_colored = np.dstack([image_grid.copy(), image_grid.copy(), image_grid.copy()])
     cv2.circle(grid_image_colored, (goal[0], goal[1]), radius, color_goal, thickness)
     cv2.circle(grid_image_colored, (strt[0], strt[1]),
             radius, color_start, thickness)
     # cv2.imshow("Image_show",grid_image_colored)
     # cv2.waitKey(0)
-
+    fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+    out = cv2.VideoWriter("./out.mp4", fourcc, 5000, (grid_columns, grid_rows))
 
 
     min_heap_node = PriorityQueue()
@@ -120,7 +121,7 @@ def djiktras_algo(strt,goal,grid_rows,grid_columns):
 
                     vstd_set.add(str(step_node))
                     grid_image_colored[step_node[1], step_node[0], :] = np.array([0, 255, 0])
-                  
+                    out.write(grid_image_colored)
                     abs_cost = cost + dst_cal[str(node.pos)]
                     dst_cal[str(step_node)] = abs_cost
                     new_node = Node(step_node, abs_cost,
@@ -139,9 +140,9 @@ def djiktras_algo(strt,goal,grid_rows,grid_columns):
 
             grid_image_colored[parnt_nde.pos[1], parnt_nde.pos[0], :] = np.array([
                                                                         255, 0, 0])
-        
+            out.write(grid_image_colored)
             parnt_nde = parnt_nde.parent
-        
+        out.release()
         cv2.imshow("Frame", grid_image_colored)
         cv2.waitKey(0)
 
