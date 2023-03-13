@@ -68,22 +68,89 @@ def djiktras_algo(strt,goal,grid_rows,grid_columns):
 
 
 
-    cv2.imshow("Image",image_grid)
-    cv2.waitKey(0)
+    # cv2.imshow("Image",image_grid)
+    # cv2.waitKey(0)
     grid_image_colored = np.dstack([image_grid.copy(), image_grid.copy(), image_grid.copy()])
     cv2.circle(grid_image_colored, (goal[0], goal[1]), radius, color_goal, thickness)
     cv2.circle(grid_image_colored, (strt[0], strt[1]),
             radius, color_start, thickness)
-    cv2.imshow("Image_show",grid_image_colored)
-    cv2.waitKey(0)
-    fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-    out = cv2.VideoWriter("C:/Users/amank/all_files/1.aman/out.mp4", fourcc, 5000, (grid_columns, grid_rows))
+    # cv2.imshow("Image_show",grid_image_colored)
+    # cv2.waitKey(0)
+
+
+
+    min_heap_node = PriorityQueue()
+
+    vstd_set = set([])
+    dict_nodes = {}
+
+
+    dst_cal = {}
+    for i in range(0, grid_columns):
+        for j in range(0, grid_rows):
+
+            dst_cal[str([i, j])] = 99999999
+
+    dst_cal[str(strt)] = 0
+    vstd_set.add(str(strt))
+    node = Node(strt, 0, None)
+    dict_nodes[str(node.pos)] = node
+    min_heap_node.put([node.cost, node.pos])
+    reached = False
+
+
+    if possible:
+        while not min_heap_node.empty():
+            node_temp = min_heap_node.get()
+            node = dict_nodes[str(node_temp[1])]
+            if node_temp[1][0] == goal[0] and node_temp[1][1] == goal[1]:
+                print("Reached. True Returned")
+                dict_nodes[str(goal)] = Node(goal, node_temp[0], node)
+                reached = True
+                break
+
+            for step_node, cost in next_step(image_grid,node,grid_rows,grid_columns):
+
+                if str(step_node) in vstd_set:
+                    temp_cost = cost + dst_cal[str(node.pos)]
+                    if temp_cost < dst_cal[str(step_node)]:
+                        dst_cal[str(step_node)] = temp_cost
+                        dict_nodes[str(step_node)].parent = node
+                else:
+
+                    vstd_set.add(str(step_node))
+                    grid_image_colored[step_node[1], step_node[0], :] = np.array([0, 255, 0])
+                  
+                    abs_cost = cost + dst_cal[str(node.pos)]
+                    dst_cal[str(step_node)] = abs_cost
+                    new_node = Node(step_node, abs_cost,
+                                    dict_nodes[str(node.pos)])
+                    dict_nodes[str(step_node)] = new_node
+
+                    min_heap_node.put([abs_cost, new_node.pos])
+
+        print("The total tiime taken for Djiktras Algorithm is {:.3f}".format( (time.time() - start_time)))
+
+        final_node = dict_nodes[str(goal)]
+
+        parnt_nde = final_node.parent
+        while parnt_nde:
+            print("The position is {} in image coordintes with a cost of {:.3f} to reach the goal".format(parnt_nde.pos, parnt_nde.cost))
+
+            grid_image_colored[parnt_nde.pos[1], parnt_nde.pos[0], :] = np.array([
+                                                                        255, 0, 0])
+        
+            parnt_nde = parnt_nde.parent
+        
+        cv2.imshow("Frame", grid_image_colored)
+        cv2.waitKey(0)
 
 
 
 
 
-def next_step(image_grid, node):  
+
+def next_step(image_grid, node,grid_rows,grid_columns):  
     i = node.x
     j = node.y
 
