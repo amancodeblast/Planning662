@@ -68,8 +68,8 @@ def djiktras_algo(strt,goal,grid_rows,grid_columns):
 
 
 
-    cv2.imshow("Image",image_grid)
-    cv2.waitKey(0)
+    # cv2.imshow("Image",image_grid)
+    # cv2.waitKey(0)
     grid_image_colored = np.dstack([image_grid.copy(), image_grid.copy(), image_grid.copy()])
     cv2.circle(grid_image_colored, (goal[0], goal[1]), radius, color_goal, thickness)
     cv2.circle(grid_image_colored, (strt[0], strt[1]),
