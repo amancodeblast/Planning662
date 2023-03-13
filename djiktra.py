@@ -127,7 +127,7 @@ def djiktras_algo(strt,goal,grid_rows,grid_columns):
 
                     min_heap_node.put([abs_cost, new_node.pos])
 
-        print("The total tiime taken for Djiktras Algorithm is {:.3f}".format( (time.time() - start_time)))
+
         # Backtracking the grid to trace the optimal path found. 
         final_node = dict_nodes[str(goal)]
 
@@ -139,6 +139,8 @@ def djiktras_algo(strt,goal,grid_rows,grid_columns):
                                                                         255, 0, 0])
             out.write(grid_image_colored)
             parnt_nde = parnt_nde.parent
+        print("The total tiime taken for Djiktras Algorithm is {:.3f}".format( (time.time() - start_time)))
+        print("This was with opencv writing video operation")
         out.release()
         cv2.imshow("Frame", grid_image_colored)
         cv2.waitKey(0)
